@@ -1,8 +1,6 @@
 import numpy as np
 from costFunction import Entropy, Gini
 
-cF = Entropy() 
-
 def check_purity(data):
     label_column = data[:, -1]
     unique_classes = np.unique(label_column)
@@ -36,21 +34,32 @@ def split_data(data, split_column, split_value):#Splitting data with the target 
     
     return data_below, data_above
 
-def Gain(data_below,data_above):
-    return  (len(data_below[:,0])/(len(data_below[:,0])+len(data_above[:,0])))*cF.getValue(data_below)+(len(data_above[:,0])/(len(data_below[:,0])+len(data_above[:,0])))*cF.getValue(data_above) - cF.getValue(np.vstack((data_below,data_above)))
+def Gain(data_below,data_above,cF):
+    # print(len(data_below[:,0]))
+    # print(len(data_above[:,0]))
+    return  cF.getValue(np.vstack((data_below,data_above)))-(len(data_below[:,0])/(len(data_below[:,0])+len(data_above[:,0])))*cF.getValue(data_below)-(len(data_above[:,0])/(len(data_below[:,0])+len(data_above[:,0])))*cF.getValue(data_above) 
 
 
-def determine_best_split(data):
+def determine_best_split(data,cF):
     potential_splits = get_potential_splits(data)
 
     max_gain = -1000
     for column_index in potential_splits:
         for value in potential_splits[column_index]:
             data_below, data_above = split_data(data, split_column = column_index, split_value = value)
-            overallgain = Gain(data_below,data_above)
+            overallgain = Gain(data_below,data_above,cF)
+            # if overallgain < 0:
+            #     print("Gain < 0")
+            # print("Column = ",column_index)
+            # print("Value = ",value)
+            # print("gain = ",overallgain)
             if overallgain > max_gain:
                 max_gain = overallgain
                 best_split_column = column_index
                 best_split_value = value
 
+    if max_gain <= 0:
+        return -1,-1
     return best_split_column, best_split_value
+
+

@@ -25,7 +25,11 @@ class Gini(costFunction):
                 pos+=1
             else:
                 neg+=1
-        return 2*(pos/(pos+neg))*(neg/(pos+neg))
+        l = pos+neg
+        pos /= l
+        neg /= l
+        # return 1-pos**2-neg**2
+        return 2*pos*neg
     
 class Entropy(costFunction):
     def __init__(self) -> None:
@@ -50,6 +54,9 @@ class Entropy(costFunction):
             n = 0
         else:
             n = -1*neg*(np.log2(neg))
+        # print("pos = ",pos)
+        # print("neg = ",neg)
+        # print("gain = ",p+n)
         return p+n
 
 
